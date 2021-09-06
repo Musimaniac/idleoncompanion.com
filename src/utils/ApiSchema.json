@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "title": "Idleon Companion Schema",
   "properties": {
@@ -59,13 +58,13 @@
       "required": ["upgrades", "vials"]
     },
     "cards": {
-      "description": "Cards tracks the tier of each card (0: unobtained, 1: bronze, 2: silver, 3: gold).",
+      "description": "Cards tracks the tier of each card (0: unobtained, 1: obtained, 2: bronze, 3: silver, 4: gold).",
       "type": "object",
       "patternProperties": {
         "": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 3
+          "maximum": 4
         }
       }
     },
@@ -75,20 +74,20 @@
         "type": "object",
         "properties": {
           "class": {
-            "description": "The class of the character.",
-            "enum": ["Beginner", "Warrior", "Mage", "Archer"]
-          },
-          "subclass": {
-            "description": "The subclass of the character, or null for no subclass.",
+            "description": "The class of the character. Must be one of the enum entries below.",
             "enum": [
-              null,
+              "Beginner",
+              "Journeyman",
+              "Maestro",
+              "Warrior",
               "Barbarian",
               "Squire",
+              "Archer",
               "Bowman",
               "Hunter",
+              "Mage",
               "Shaman",
-              "Wizard",
-              "Journeyman"
+              "Wizard"
             ]
           },
           "name": {
@@ -101,7 +100,7 @@
             "minimum": 1
           },
           "items": {
-            "description": "The items that the character owns, including bags, pouches, etc.",
+            "description": "The items that the character owns, including bags, pouches, etc. Should appear exactly as in the game (e.g. 'Inventory Bag A').",
             "type": "object",
             "patternProperties": {
               "": {
@@ -117,19 +116,30 @@
                 "type": "integer",
                 "minimum": 0
               }
-            }
+            },
+            "required": [
+              "Alchemy",
+              "Catching",
+              "Choppin'",
+              "Construction",
+              "Fishing",
+              "Mining",
+              "Smithing",
+              "Trapping",
+              "Worship"
+            ]
           },
           "constellations": {
-            "description": "The constellations that the character has completed.",
+            "description": "The constellations that the character has completed. Use the constellation ID (e.g. A-1, B-7).",
             "type": "object",
             "patternProperties": {
-              "": {
+              "^[A-Z]+-\\d+$": {
                 "type": "boolean"
               }
             }
           },
           "starSigns": {
-            "description": "The star signs that the character has equipped.",
+            "description": "The star signs that the character has equipped. Use the star sign ID (e.g. 1, 1a, 7c, 10).",
             "type": "object",
             "patternProperties": {
               "": {
@@ -140,7 +150,6 @@
         },
         "required": [
           "class",
-          "subclass",
           "name",
           "level",
           "items",
@@ -152,7 +161,7 @@
       "maxItems": 9
     },
     "checklist": {
-      "description": "Items collected for the progress tracker, such as chests, inventory bags, or stamps.",
+      "description": "Items collected for the progress tracker, such as chests, inventory bags, or stamps. Should appear exactly as in the game (e.g. 'Bag o Heads Stamp').",
       "type": "object",
       "patternProperties": {
         "": {
@@ -161,7 +170,7 @@
       }
     },
     "stamps": {
-      "description": "Levels for each stamp that the player has unlocked.",
+      "description": "Levels for each stamp that the player has unlocked. Key is stamp name (e.g. 'Alch Go Brrr Stamp').",
       "type": "object",
       "patternProperties": {
         "": {
@@ -171,7 +180,7 @@
       }
     },
     "starSigns": {
-      "description": "The star signs that have been unlocked by spending Star Chart Points.",
+      "description": "The star signs that have been unlocked by spending Star Chart Points. Key is star sign ID: (e.g. 1, 1a, 7c, 10).",
       "type": "object",
       "patternProperties": {
         "": {
@@ -180,7 +189,7 @@
       }
     },
     "statues": {
-      "description": "Tracking information for statues, including level, progress, and golden status.",
+      "description": "Tracking information for statues, including level, progress, and golden status. Key is statue name (e.g. 'Power Statue').",
       "type": "object",
       "patternProperties": {
         "": {
@@ -203,9 +212,9 @@
       }
     },
     "version": {
-      "description": "Only accepts the latest game version supported on Idleon Companion.",
+      "description": "The game version from which this data was retrieved.",
       "type": "string",
-      "pattern": "^1\\.22(.+)?"
+      "pattern": "^\\d+\\.\\d+(.+)?"
     }
   },
   "required": ["version"],

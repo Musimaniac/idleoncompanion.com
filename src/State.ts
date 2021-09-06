@@ -12,36 +12,37 @@ import { version } from "../package.json";
 import firebase from "firebase/app";
 
 const StorageKey = "idleon-companion";
-export const useState = createGlobalState(() =>
-  useStorage(StorageKey, {
-    alchemy: {
-      goals: {
-        Orange: [],
-        Green: [],
-        Purple: [],
-        Yellow: [],
-      },
-      upgrades: {
-        Orange: [],
-        Green: [],
-        Purple: [],
-        Yellow: [],
-      },
-      vials: {},
-    } as AlchemyData,
-    cards: {} as Record<string, number>,
-    chars: [] as Character[],
-    checklist: {} as Record<string, boolean>,
-    stamps: {} as Record<string, number>,
-    starSigns: {} as Record<string, boolean>,
-    statues: {} as Record<StatueName, StatueInfo>,
-    tasks: {
-      dailyReset: "12:00",
-      tasks: Array<Task>(),
-      timers: Array<Timer>(),
+export const DefaultState = {
+  alchemy: {
+    goals: {
+      Orange: [],
+      Green: [],
+      Purple: [],
+      Yellow: [],
     },
-    version: "0.2.0",
-  })
+    upgrades: {
+      Orange: [],
+      Green: [],
+      Purple: [],
+      Yellow: [],
+    },
+    vials: {},
+  } as AlchemyData,
+  cards: {} as Record<string, number>,
+  chars: [] as Character[],
+  checklist: {} as Record<string, boolean>,
+  stamps: {} as Record<string, number>,
+  starSigns: {} as Record<string, boolean>,
+  statues: {} as Record<StatueName, StatueInfo>,
+  tasks: {
+    dailyReset: "12:00",
+    tasks: Array<Task>(),
+    timers: Array<Timer>(),
+  },
+  version: "0.2.0",
+};
+export const useState = createGlobalState(() =>
+  useStorage(StorageKey, DefaultState)
 );
 
 export function versionControl() {
@@ -114,7 +115,9 @@ export function versionControl() {
       for (let i = 0; i < amount; i++) {
         state.value.alchemy.upgrades[k][i] =
           state.value.alchemy.upgrades[k][i] ?? 0;
-        state.value.alchemy.goals[k][i] = state.value.alchemy.goals[k][i] ?? 0;
+        state.value.alchemy.goals[k][i] =
+          state.value.alchemy.goals[k][i] ??
+          state.value.alchemy.upgrades[k][i] + 1;
       }
     }
   }
@@ -155,6 +158,14 @@ export function versionControl() {
           state.value.chars[key].class;
         delete (state.value.chars[key] as Character & { subclass: any })
           .subclass;
+      }
+    }
+    // Also, change cards to be stored without underscores for API imports
+    for (const key in state.value.cards) {
+      // Only replace keys that have underscores
+      if (key.includes("_")) {
+        state.value.cards[key.replace(/_/g, " ")] = state.value.cards[key];
+        delete state.value.cards[key];
       }
     }
   }
